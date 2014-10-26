@@ -2,7 +2,10 @@ package com.jj.drag;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.FloatMath;
@@ -70,6 +73,8 @@ public class DragImageView extends ImageView {
 
 	private MyAsyncTask myAsyncTask;// 异步动画
 
+    private Paint mPaint;
+
 	/** 构造方法 **/
 	public DragImageView(Context context) {
 		super(context);
@@ -100,7 +105,8 @@ public class DragImageView extends ImageView {
 	public void setImageBitmap(Bitmap bm) {
 		super.setImageBitmap(bm);
 		/** 获取图片宽高 **/
-		bitmap_W = bm.getWidth();
+
+		bitmap_W = bm.getWidth()*bm.getDensity();
 		bitmap_H = bm.getHeight();
 
 		MAX_W = bitmap_W * 3;
@@ -111,7 +117,24 @@ public class DragImageView extends ImageView {
 
 	}
 
-	@Override
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        Intent i = new Intent();
+        i.setAction("broadcast_marker");
+        i.putExtra("l",current_Left);
+        i.putExtra("t", current_Top);
+        i.putExtra("r", current_Right);
+        i.putExtra("b",current_Bottom);
+
+        getContext().sendBroadcast(i);
+
+//        Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.marker_film);
+//        canvas.drawBitmap(bmp,10,10,mPaint);
+    }
+
+    @Override
 	protected void onLayout(boolean changed, int left, int top, int right,
 			int bottom) {
 		super.onLayout(changed, left, top, right, bottom);

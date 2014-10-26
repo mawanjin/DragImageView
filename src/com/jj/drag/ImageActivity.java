@@ -9,7 +9,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity {
+public class ImageActivity extends Activity {
 	private int window_width, window_height;// 控件宽度
 	private DragImageView dragImageView;// 自定义控件
     private MarkerImage markerContainer;
