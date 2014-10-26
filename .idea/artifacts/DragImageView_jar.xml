@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DragImageView:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/DragImageView_jar</output-path>
+    <root id="archive" name="DragImageView.jar">
+      <element id="module-output" name="DragImageView" />
+    </root>
+  </artifact>
+</component>

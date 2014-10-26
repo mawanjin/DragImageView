@@ -36,6 +36,7 @@ public class TouchImageViewActivity extends Activity {
             @Override
             public Pointer onClick(Pointer p) {
                 Log.d(TAG,"good");
+
                 return null;
             }
         });

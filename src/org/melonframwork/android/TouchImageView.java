@@ -1,4 +1,4 @@
-package com.jj.drag;
+package org.melonframwork.android;
 
 import android.app.Activity;
 import android.content.Context;
@@ -79,11 +79,13 @@ public class TouchImageView extends ImageView {
     float paddingUp=20;
     Matrix inverseMatrix = new Matrix();
     //动态生成的可点击的控件
-    List<Pointer> viewItems;
+    List<? extends Pointer> viewItems;
+    private float textSize=40;
 
-    public TouchImageView(Context context, int background) {
+    public TouchImageView(Context context, int background,List<? extends Pointer> pinters) {
         super(context);
-        viewItems = ImageFactory.getInstance(context).getViewItems();
+        viewItems = pinters;
+//        viewItems = ImageFactory.getInstance(context).getViewItems();
         gintama = BitmapFactory.decodeResource(getResources(), background);
         DisplayMetrics dm = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -126,7 +128,7 @@ public class TouchImageView extends ImageView {
         retrieveCurrentMapInfo();
         double rat = current_Width / 1000;
 
-        for (Pointer p : ImageFactory.getInstance(getContext()).getViewItems()) {
+        for (Pointer p : viewItems) {
             if (rat >= 1) {
                 mPaint.setAlpha(255);
                 click = true;
@@ -146,7 +148,7 @@ public class TouchImageView extends ImageView {
                 txtp.setTextAlign(Paint.Align.CENTER);
                 txtp.setAntiAlias(true);//去除锯齿
                 txtp.setFilterBitmap(true);//对位图进行滤波处理
-                txtp.setTextSize(48);
+                txtp.setTextSize(textSize);
                 canvas.drawText(p.txt, tip.immutableX + tip.width / 2, tip.immutableY + tip.height / 2 + tip.txtPadding, txtp);
             }
         }
@@ -228,7 +230,7 @@ public class TouchImageView extends ImageView {
                 break;
             }
             //检查tip点击事件
-            if (pointer1.tip.checkRange(a[0], a[1])) {
+            if (pointer1.showing&&pointer1.tip.checkRange(a[0], a[1])) {
                 if (eventDispatcher != null) eventDispatcher.onClick(pointer1.tip);
                 break;
             }
@@ -292,7 +294,6 @@ public class TouchImageView extends ImageView {
 //        float y3 = f[3] * 0 + originalMap.getHeight() + f[5];
 //        float x4 = originalMap.getWidth() + f[2];
 //        float y4 = y3;
-
         float x1 = f[0] * 0 + f[1] * 0 + f[2];
         float y1 = f[3] * 0 + f[4] * 0 + f[5];
         float x2 = f[0] * originalMap.getWidth() + f[1] * 0 + f[2];
@@ -301,7 +302,6 @@ public class TouchImageView extends ImageView {
         float y3 = f[3] * 0 + f[4] * originalMap.getHeight() + f[5];
         float x4 = f[0] * originalMap.getWidth() + f[1] * originalMap.getHeight() + f[2];
         float y4 = f[3] * originalMap.getWidth() + f[4] * originalMap.getHeight() + f[5];
-
         // 图片现宽度
         current_Width = (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     }
@@ -374,6 +374,26 @@ public class TouchImageView extends ImageView {
 
     public void setEventDispatcher(EventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
+    }
+
+    public void setTextSize(float textSize) {
+        this.textSize = textSize;
+    }
+
+    public float getPaddingDown() {
+        return paddingDown;
+    }
+
+    public void setPaddingDown(float paddingDown) {
+        this.paddingDown = paddingDown;
+    }
+
+    public float getPaddingUp() {
+        return paddingUp;
+    }
+
+    public void setPaddingUp(float paddingUp) {
+        this.paddingUp = paddingUp;
     }
 
     class MyAsyncTask extends AsyncTask<Void, Float, Void> {
