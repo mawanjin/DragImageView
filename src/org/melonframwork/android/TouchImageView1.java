@@ -17,8 +17,8 @@ import java.util.List;
  * Date: 12/17/13
  * Time: 5:13 PM
  */
-public class TouchImageView extends ImageView {
-    String TAG = TouchImageView.class.getName();
+public class TouchImageView1 extends ImageView {
+    String TAG = TouchImageView1.class.getName();
 
     private EventDispatcher eventDispatcher;
     private Activity mActivity;
@@ -30,7 +30,6 @@ public class TouchImageView extends ImageView {
     float oldDist = 1f;
     float oldRotation = 0;
     Matrix matrix;
-    Matrix scaledMatrix;
     private static final int NONE = 0;
     private static final int DRAG = 1;
     private static final int ZOOM = 2;
@@ -75,18 +74,19 @@ public class TouchImageView extends ImageView {
     float movePreX;
     float movePreY;
     //向下拖动时加的间距
-    float paddingDown = 20;
+    float paddingDown=20;
     //向上拖动时加的间距
-    float paddingUp = 20;
+    float paddingUp=20;
     Matrix inverseMatrix = new Matrix();
     //动态生成的可点击的控件
     List<? extends Pointer> viewItems;
-    private float textSize = 40;
+    private float textSize=40;
     private boolean interceptor = true;
 
-    public TouchImageView(Context context, Bitmap background, List<? extends Pointer> pinters) {
+    public TouchImageView1(Context context, Bitmap background, List<? extends Pointer> pinters) {
         super(context);
         viewItems = pinters;
+//        gintama = BitmapFactory.decodeResource(getResources(), background);
         gintama = background;
         DisplayMetrics dm = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -120,65 +120,33 @@ public class TouchImageView extends ImageView {
         canvas.restore();
     }
 
+
+
     /**
      * 图片缩放到一定程序的时候，小图标不可点击。
      *
      * @param canvas
      */
     private void refreshPic(Canvas canvas) {
-        boolean isRestored = false;
         retrieveCurrentMapInfo();
-
         click = true;
-        scaledMatrix = matrix;
-        matrix.invert(inverseMatrix);
+        double rat = current_Width / 1000;
 
         for (Pointer p : viewItems) {
-
-            canvas.drawBitmap(p.bitmap, p.immutableX, p.immutableY, mPaint);
-
-//            if (p.showing) {
-//                if(!isRestored){
-//                    canvas.restore();
-//                    isRestored = true;
-//                }
-//
-//                Pointer tip = p.tip;
-//                float[] a = {tip.immutableX, tip.immutableY};
-//                scaledMatrix.mapPoints(a);
-//                float[] b = {p.immutableX+p.width/2, p.immutableY};
-//                scaledMatrix.mapPoints(b);
-//                canvas.drawBitmap(tip.bitmap, b[0]-tip.width/2, b[1]-tip.height, mPaint);
-//                tip.setRealX(b[0]-tip.width/2);
-//                tip.setRealY(b[1]-tip.height);
-//
-//                Paint txtp = new Paint();
-//                txtp.setColor(Color.WHITE);
-//                txtp.setTextAlign(Paint.Align.CENTER);
-//                txtp.setAntiAlias(true);//去除锯齿
-//                txtp.setFilterBitmap(true);//对位图进行滤波处理
-//                txtp.setTextSize(textSize);
-//                canvas.drawText(p.txt, b[0], b[1]-tip.height+tip.height/2+tip.txtPadding, txtp);
-//
+//            if (rat >= 1) {
+//                mPaint.setAlpha(255);
+//                click = true;
+//            } else {
+//                int alpha = (int) (255 * rat);
+//                click = true;
+//                if (alpha < 200) click = false;
+//                mPaint.setAlpha((int) (255 * rat));
 //            }
-
-        }
-
-        for (Pointer p : viewItems) {
+            canvas.drawBitmap(p.bitmap, p.immutableX, p.immutableY, mPaint);
             if (p.showing) {
-                if (!isRestored) {
-                    canvas.restore();
-                    isRestored = true;
-                }
 
                 Pointer tip = p.tip;
-                float[] a = {tip.immutableX, tip.immutableY};
-                scaledMatrix.mapPoints(a);
-                float[] b = {p.immutableX + p.width / 2, p.immutableY};
-                scaledMatrix.mapPoints(b);
-                canvas.drawBitmap(tip.bitmap, b[0] - tip.width / 2, b[1] - p.height+tip.paddingBottom, mPaint);
-                tip.setRealX(b[0] - tip.width / 2);
-                tip.setRealY(b[1] - tip.height);
+                canvas.drawBitmap(tip.bitmap, tip.immutableX, tip.immutableY, mPaint);
 
                 Paint txtp = new Paint();
                 txtp.setColor(Color.WHITE);
@@ -186,12 +154,9 @@ public class TouchImageView extends ImageView {
                 txtp.setAntiAlias(true);//去除锯齿
                 txtp.setFilterBitmap(true);//对位图进行滤波处理
                 txtp.setTextSize(textSize);
-                canvas.drawText(p.txt, b[0], b[1] - p.height + tip.height / 4 + tip.txtPadding, txtp);
-
+                canvas.drawText(p.txt, tip.immutableX + tip.width / 2, tip.immutableY + tip.height / 2 + tip.txtPadding, txtp);
             }
         }
-
-        canvas.save();
 
     }
 
@@ -204,9 +169,9 @@ public class TouchImageView extends ImageView {
                 try {
                     x_down = event.getX();
                     y_down = event.getY();
-                } catch (IllegalArgumentException e) {
-                    x_down = movePreX;
-                    y_down = movePreY;
+                }catch (IllegalArgumentException e){
+                    x_down=movePreX;
+                    y_down=movePreY;
                 }
 
                 movePreX = x_down;
@@ -219,6 +184,7 @@ public class TouchImageView extends ImageView {
                 mode = ZOOM;
                 oldDist = spacing(event);
                 oldRotation = rotation(event);
+//                savedMatrix.set(matrix);
                 midPoint(mid, event);
 
                 break;
@@ -250,15 +216,12 @@ public class TouchImageView extends ImageView {
                         offsetY = event.getY() - movePreY;
                         movePreX = event.getX();
                         movePreY = event.getY();
-                    } catch (IllegalArgumentException e) {
+                    }catch (IllegalArgumentException e){
                     }
 
                     float[] a = checkBounds(offsetX, offsetY);
-                    if(interceptor){
-                        matrix.postTranslate(a[0], a[1]);// 平移
-                        invalidate();
-                    }
-
+                    matrix.postTranslate(a[0], a[1]);// 平移
+                    invalidate();
                     getParent().requestDisallowInterceptTouchEvent(interceptor);
                 }
                 break;
@@ -281,25 +244,21 @@ public class TouchImageView extends ImageView {
         Log.i(TAG, "onclick..x=" + x + ";y=" + y + ";a.x=" + a[0] + ";a.y=" + a[1]);
         for (Pointer pointer1 : viewItems) {
             //检查小图标点击事件
-            if (pointer1.checkRange(a[0], a[1], false, null)) {
-                if (!pointer1.showing) {//显示tip
-
-                    for(Pointer innerP : viewItems){
-                        innerP.showing = false;
-                    }
-
-                    pointer1.showing = true;
-                } else
-                    pointer1.showing = false;
-                invalidate();
-                if (eventDispatcher != null) eventDispatcher.onClick(pointer1, false);
-                break;
-            }
-            //检查tip点击事件
-            if (pointer1.showing && pointer1.tip.checkRange(x, y, true, pointer1.tip)) {
-                if (eventDispatcher != null) eventDispatcher.onClick(pointer1, true);
-                break;
-            }
+//            if (pointer1.checkRange(a[0], a[1])) {
+//                if (!pointer1.showing) {//显示tip
+//                    pointer1.showing = true;
+//                } else
+//                    pointer1.showing = false;
+//                invalidate();
+//                if (eventDispatcher != null) eventDispatcher.onClick(pointer1,false);
+//                break;
+//            }
+//            //检查tip点击事件
+//            if (pointer1.showing&&pointer1.tip.checkRange(a[0], a[1])) {
+////                if (eventDispatcher != null) eventDispatcher.onClick(pointer1.tip);
+//                if (eventDispatcher != null) eventDispatcher.onClick(pointer1,true);
+//                break;
+//            }
         }
     }
 
@@ -326,14 +285,11 @@ public class TouchImageView extends ImageView {
         Log.d(TAG, a[0] + ";" + a[1] + ";offset(x,y)=" + _offsetX + "," + _offsetY + "+checkBounds:: (x1,y1)=" + x1 + "," + y1 + ";(x2,y2)=" + x2 + "," + y2 + ";(x3,y3)=" + x3 + "," + y3 + ";(x4,y4)=" + x4 + "," + y4);
 
         if ((x1 + _offsetX - marginLeft) >= 0 && a[0] > 0) a[0] = 0;
-        if ((x2 + _offsetX + marginLeft) <= widthScreen && a[0] < 0) {
-            interceptor = false;
-            a[0] = 0;
-        }
+        if ((x2 + _offsetX + marginLeft) <= widthScreen && a[0] < 0){interceptor=false;a[0] = 0;}
         //下向拖动
-        if ((y2 + _offsetY + paddingDown > 0 && a[1] > 0)) a[1] = 0;
+        if ((y2+_offsetY+paddingDown > 0 && a[1] > 0)) a[1] = 0;
         //向上拖动
-        if ((y3 + _offsetY - paddingUp < heightScreen && a[1] < 0)) a[1] = 0;
+        if ((y3+_offsetY-paddingUp < heightScreen && a[1] < 0)) a[1] = 0;
         return a;
     }
 
@@ -378,11 +334,11 @@ public class TouchImageView extends ImageView {
 
     // 触碰两点间距离
     private float spacing(MotionEvent event) {
-        try {
+        try{
             float x = event.getX(0) - event.getX(1);
             float y = event.getY(0) - event.getY(1);
             return FloatMath.sqrt(x * x + y * y);
-        } catch (IllegalArgumentException e) {
+        }catch (IllegalArgumentException e){
 
         }
         return 0;
@@ -403,6 +359,17 @@ public class TouchImageView extends ImageView {
         return (float) Math.toDegrees(radians);
     }
 
+    // 将移动，缩放以及旋转后的图层保存为新图片
+    // 本例中沒有用到該方法，需要保存圖片的可以參考
+    public Bitmap CreatNewPhoto() {
+        Bitmap bitmap = Bitmap.createBitmap(widthScreen, heightScreen,
+                Bitmap.Config.ARGB_8888); // 背景图片
+        Canvas canvas = new Canvas(bitmap); // 新建画布
+        canvas.drawBitmap(gintama, matrix, null); // 画图片
+        canvas.save(Canvas.ALL_SAVE_FLAG); // 保存画布
+        canvas.restore();
+        return bitmap;
+    }
 
     public Bitmap initMap() {
         //用于居中

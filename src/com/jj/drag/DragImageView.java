@@ -52,9 +52,9 @@ public class DragImageView extends ImageView {
 
 	/**
 	 * 模式 NONE：无 DRAG：拖拽. ZOOM:缩放
-	 * 
+	 *
 	 * @author zhangjia
-	 * 
+	 *
 	 */
 	private enum MODE {
 		NONE, DRAG, ZOOM
